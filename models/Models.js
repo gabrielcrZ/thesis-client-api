@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-export const tokenRequestModel = mongoose.model(
+export const clientModel = mongoose.model(
   "Clients",
   new mongoose.Schema({
     email: {
