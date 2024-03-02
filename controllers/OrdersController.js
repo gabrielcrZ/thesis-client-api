@@ -7,7 +7,7 @@ export const clientRequest = async (req, res) => {
       msg: "User created!",
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(500).json({
       msg: error.message,
     });
   }
@@ -26,9 +26,15 @@ export const tokenRequest = async (req, res) => {
 };
 
 export const orderRequest = async (req, res) => {
-  res.status(200).json({
-    body: req.body,
-  });
+  try {
+    res.status(200).json({
+      msg: "You reached order controller",
+    });
+  } catch (error) {
+    res.status(500).json({
+      msg: error.message,
+    });
+  }
 };
 
 export const updateRequest = async (req, res) => {

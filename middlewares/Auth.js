@@ -37,14 +37,31 @@ const authorizationHandler = async (req, res, next) => {
   const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
   const decodedEmail = decodedToken.email;
   const decodedClientCode = decodedToken.clientCode;
+
+  if (email !== decodedEmail || clientCode !== decodedClientCode) {
+    return res.status(400).json({
+      msg: "Authorization information does not match!",
+    });
+  }
+
   try {
-    const client = clientModel.findOne({email})
-    ///ramas aici
+    const client = await clientModel.findOne({ email });
     if (!client) {
-      throw new Error(`No client found with email: ${email}`)
+      throw new Error(`No client found with email: ${email}`);
+    }
+
+    const isMatchingClientCode = await bcrypt.compare(
+      clientCode,
+      client.clientCode
+    );
+    if (!isMatchingClientCode) {
+      throw new Error(
+        `Provided client code is not valid for client: ${client.email}!`
+      );
     }
     next();
   } catch (error) {
+    // To do an error handling mechanism
     res.status(400).json({
       msg: error.message,
     });
@@ -55,7 +72,7 @@ const newClientHandler = async (req, res, next) => {
   const { email, clientCode } = req.body;
   if (!email || !clientCode) {
     return res.status(400).json({
-      msg: "Email address or client code was not provided or is invalid!",
+      msg: "Email address or client code was not provided!",
     });
   }
   const salt = await bcrypt.genSalt(10);
