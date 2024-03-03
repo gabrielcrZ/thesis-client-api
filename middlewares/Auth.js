@@ -20,12 +20,12 @@ const tokenRequestHandler = async (req, res, next) => {
 
 const authorizationHandler = async (req, res, next) => {
   const authFromHeaders = req.headers.authorization;
-  const { email, clientCode } = req.body;
-  if (!email || !clientCode) {
-    return res.status(400).json({
-      msg: "Email address or client code was not provided or is invalid!",
-    });
-  }
+  // const { email, clientCode } = req.body;
+  // if (!email || !clientCode) {
+  //   return res.status(400).json({
+  //     msg: "Email address or client code was not provided or is invalid!",
+  //   });
+  // }
 
   if (!authFromHeaders || !authFromHeaders.startsWith("Bearer")) {
     res.status(401).json({
@@ -34,24 +34,23 @@ const authorizationHandler = async (req, res, next) => {
   }
 
   const token = authFromHeaders.split(" ")[1];
-  const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+  const decodedToken = decodeAuthorizationToken(token);
   const decodedEmail = decodedToken.email;
   const decodedClientCode = decodedToken.clientCode;
 
-  if (email !== decodedEmail || clientCode !== decodedClientCode) {
-    return res.status(400).json({
-      msg: "Authorization information does not match!",
-    });
-  }
-
+  // if (email !== decodedEmail || clientCode !== decodedClientCode) {
+  //   return res.status(400).json({
+  //     msg: "Authorization information does not match!",
+  //   });
+  // }
   try {
-    const client = await clientModel.findOne({ email });
+    const client = await clientModel.findOne({ email: decodedEmail });
     if (!client) {
-      throw new Error(`No client found with email: ${email}`);
+      throw new Error(`No client found with email: ${decodedEmail}`);
     }
 
     const isMatchingClientCode = await bcrypt.compare(
-      clientCode,
+      decodedClientCode,
       client.clientCode
     );
     if (!isMatchingClientCode) {
@@ -82,4 +81,13 @@ const newClientHandler = async (req, res, next) => {
   next();
 };
 
-export { tokenRequestHandler, authorizationHandler, newClientHandler };
+const decodeAuthorizationToken = (token) => {
+  return jwt.verify(token, process.env.JWT_SECRET);
+};
+
+export {
+  tokenRequestHandler,
+  authorizationHandler,
+  newClientHandler,
+  decodeAuthorizationToken,
+};

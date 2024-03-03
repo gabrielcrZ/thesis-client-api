@@ -1,4 +1,5 @@
-import { clientModel } from "../models/Models.js";
+import { clientModel, orderModel } from "../models/Models.js";
+import { decodeAuthorizationToken } from "../middlewares/Auth.js";
 
 export const clientRequest = async (req, res) => {
   try {
@@ -27,8 +28,21 @@ export const tokenRequest = async (req, res) => {
 
 export const orderRequest = async (req, res) => {
   try {
+    let authFromHeaders = req.headers.authorization;
+    const token = authFromHeaders.split(" ")[1];
+    const email = decodeAuthorizationToken(token).email;
+
+    const newOrder = {
+      clientEmail: email,
+      currentStatus: "Registered by client",
+      ...req.body,
+    };
+    // remained here, enrich new client call, enrich new order payload
+    // check the commented code on authorization handler
+    await orderModel.create(newOrder);
     res.status(200).json({
-      msg: "You reached order controller",
+      msg: "Order was added successfully!",
+      order: newOrder
     });
   } catch (error) {
     res.status(500).json({
