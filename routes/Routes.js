@@ -1,9 +1,10 @@
 import { Router } from "express";
 import {
-  clientRequest,
-  tokenRequest,
-  orderRequest,
-  updateRequest,
+  addClient,
+  getToken,
+  addOrder,
+  getOrders,
+  updateOrder,
 } from "../controllers/OrdersController.js";
 import {
   tokenRequestHandler,
@@ -12,9 +13,10 @@ import {
 } from "../middlewares/Auth.js";
 
 const router = Router();
-router.route("/client-create").post(newClientHandler, clientRequest);
-router.route("/token-request").post(tokenRequestHandler, tokenRequest);
-router.route("/order-request").post(authorizationHandler, orderRequest);
-router.route("/order-update").post(authorizationHandler, updateRequest);
+router.route("/add-client").post(newClientHandler, addClient);
+router.route("/get-token").post(tokenRequestHandler, getToken);
+router.route("/add-order").post(authorizationHandler, addOrder);
+router.route("/get-orders").get(authorizationHandler, getOrders);
+router.route("/update-order").patch(authorizationHandler, updateOrder);
 
 export default router;

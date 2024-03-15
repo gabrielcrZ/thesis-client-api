@@ -6,10 +6,7 @@ const clientModel = mongoose.model(
     email: {
       type: String,
       required: [true, "No email provided!"],
-      match: [
-        /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g,
-        "Email address is invalid!",
-      ],
+      match: [/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g, "Email address is invalid!"],
       unique: true,
     },
     clientCode: {
