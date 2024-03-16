@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const clientModel = mongoose.model(
-  "Clients",
+  "Client",
   new mongoose.Schema({
     email: {
       type: String,
@@ -17,7 +17,7 @@ const clientModel = mongoose.model(
 );
 
 const orderModel = mongoose.model(
-  "Orders",
+  "Order",
   new mongoose.Schema(
     {
       clientEmail: {
@@ -53,6 +53,7 @@ const orderModel = mongoose.model(
       },
       currentStatus: {
         type: String,
+        required: [true, "No status provided for the shipment!"],
       },
     },
     {
@@ -61,4 +62,34 @@ const orderModel = mongoose.model(
   )
 );
 
-export { clientModel, orderModel };
+const ordersHistoryModel = mongoose.model(
+  "OrdersUpdate",
+  new mongoose.Schema(
+    {
+      orderId: {
+        type: String,
+        required: [true, "No order Id was provided for the shipment!"],
+      },
+      currentLocation: {
+        type: String,
+        required: [true, "No current location provided for the shipment!"],
+      },
+      currentStatus: {
+        type: String,
+        required: [true, "No status provided for the shipment!"],
+      },
+      updatedBy: {
+        type: String,
+        required: [true, "No information regarding the updater was provided!"],
+      },
+      additionalInfo: {
+        type: String,
+      },
+    },
+    {
+      timestamps: true,
+    }
+  )
+);
+
+export { clientModel, orderModel, ordersHistoryModel };

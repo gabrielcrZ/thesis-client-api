@@ -51,12 +51,6 @@ export const addOrder = async (req, res) => {
   }
 };
 
-export const updateOrder = async (req, res) => {
-  req.status(200).json({
-    body: req.body,
-  });
-};
-
 export const getOrders = async (req, res) => {
   try {
     let authFromHeaders = req.headers.authorization;
