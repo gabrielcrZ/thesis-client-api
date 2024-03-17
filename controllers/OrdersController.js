@@ -1,5 +1,10 @@
-import { clientModel, orderModel } from "../models/Models.js";
+import {
+  clientModel,
+  orderModel,
+  ordersHistoryModel,
+} from "../models/Models.js";
 import { decodeAuthorizationToken } from "../middlewares/Auth.js";
+import { mapOrderUpdate } from "../helpers/Helpers.js";
 
 export const addClient = async (req, res) => {
   try {
@@ -60,9 +65,29 @@ export const getOrders = async (req, res) => {
     const clientOrders = await orderModel
       .find({ clientEmail: decodedEmail })
       .sort("createdAt");
+    const ordersUpdates = await ordersHistoryModel
+      .find({
+        clientEmail: decodedEmail,
+      })
+      .sort("-createdAt");
+
+    let response = [];
+    let currentOrder;
+    clientOrders.forEach((order) => {
+      let latestOrderUpdate = ordersUpdates.filter(
+        (update) => update.orderId === order.id
+      )[0];
+
+      if (latestOrderUpdate) {
+        currentOrder = mapOrderUpdate(order, latestOrderUpdate);
+      } else {
+        currentOrder = order;
+      }
+      response.push(currentOrder);
+    });
     res.status(200).json({
-      orders: clientOrders,
-      count: clientOrders.length,
+      orders: response,
+      count: response.length,
     });
   } catch (error) {
     res.status(500).json({

@@ -70,6 +70,14 @@ const ordersHistoryModel = mongoose.model(
         type: String,
         required: [true, "No order Id was provided for the shipment!"],
       },
+      clientEmail: {
+        type: String,
+        required: [true, "No information regarding client email was provided"],
+        match: [
+          /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g,
+          "Email address is not valid!",
+        ],
+      },
       currentLocation: {
         type: String,
         required: [true, "No current location provided for the shipment!"],
