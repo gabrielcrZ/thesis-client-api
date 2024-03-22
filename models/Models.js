@@ -13,6 +13,18 @@ const clientModel = mongoose.model(
       type: String,
       required: [true, "Client code is invalid!"],
     },
+    clientName: {
+      type: String,
+      required: [true, "No client name provided!"],
+    },
+    clientAddress: {
+      type: String,
+      required: [true, "No client address provided!"],
+    },
+    clientPhone: {
+      type: String,
+      required: [true, "No phone number provided"],
+    },
   })
 );
 
