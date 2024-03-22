@@ -1,5 +1,5 @@
 {
-  "name": "orders-api",
+  "name": "client-api",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
