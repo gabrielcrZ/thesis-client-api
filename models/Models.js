@@ -67,6 +67,10 @@ const orderModel = mongoose.model(
         type: String,
         required: [true, "No status provided for the shipment!"],
       },
+      lastUpdatedBy: {
+        type: String,
+        required: [true, "No last updater provided for the shipment!"],
+      },
     },
     {
       timestamps: true,

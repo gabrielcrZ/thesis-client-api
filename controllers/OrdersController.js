@@ -1,4 +1,8 @@
-import { clientModel, orderModel } from "../models/Models.js";
+import {
+  clientModel,
+  orderModel,
+  ordersHistoryModel,
+} from "../models/Models.js";
 import { decodeAuthorizationToken } from "../middlewares/Auth.js";
 
 export const addClient = async (req, res) => {
@@ -36,13 +40,25 @@ export const addOrder = async (req, res) => {
     const newOrder = {
       clientEmail: email,
       currentStatus: "Registered by client",
+      lastUpdatedBy: email,
       ...req.body,
     };
 
-    await orderModel.create(newOrder).then(() => {
-      res.status(200).json({
-        msg: "Order was added successfully!",
-        order: newOrder,
+    await orderModel.create(newOrder).then(async (addedOrder) => {
+      const newOrderUpdate = {
+        orderId: addedOrder.id,
+        clientEmail: addedOrder.clientEmail,
+        currentLocation: addedOrder.currentLocation,
+        currentStatus: addedOrder.currentStatus,
+        updatedBy: addedOrder.clientEmail,
+        additionalInfo: "Order has been created by the client!",
+      };
+
+      await ordersHistoryModel.create(newOrderUpdate).then(() => {
+        res.status(200).json({
+          msg: "Order was added successfully!",
+          order: addedOrder,
+        });
       });
     });
   } catch (error) {
@@ -63,7 +79,7 @@ export const getOrders = async (req, res) => {
       .sort("createdAt")
       .then((clientOrders) => {
         res.status(200).json({
-          orders: clientOrders,
+          orders: clientOrders || [],
           count: clientOrders.length,
         });
       });
@@ -82,12 +98,12 @@ export const getOrder = async (req, res) => {
 
     await orderModel
       .findOne({
-        id: req.orderId,
+        _id: req.params.id,
         clientEmail: decodedEmail,
       })
       .then((foundOrder) => {
         res.status(200).json({
-          order: foundOrder,
+          order: foundOrder || "",
         });
       });
   } catch (error) {
