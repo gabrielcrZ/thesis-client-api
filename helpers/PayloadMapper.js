@@ -9,6 +9,7 @@ export const mapNewOrder = (clientEmail, orderRequest) => {
 
 export const mapNewOrderUpdate = (newOrder) => {
   return {
+    operationType: "Update",
     orderId: newOrder.id,
     clientEmail: newOrder.clientEmail,
     currentLocation: newOrder.currentLocation,
