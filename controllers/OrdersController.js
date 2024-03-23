@@ -4,6 +4,7 @@ import {
   ordersHistoryModel,
 } from "../models/Models.js";
 import { decodeAuthorizationToken } from "../middlewares/Auth.js";
+import { mapNewOrder, mapNewOrderUpdate } from "../helpers/PayloadMapper.js";
 
 export const addClient = async (req, res) => {
   try {
@@ -36,23 +37,10 @@ export const addOrder = async (req, res) => {
     let authFromHeaders = req.headers.authorization;
     const token = authFromHeaders.split(" ")[1];
     const email = decodeAuthorizationToken(token).email;
-
-    const newOrder = {
-      clientEmail: email,
-      currentStatus: "Registered by client",
-      lastUpdatedBy: email,
-      ...req.body,
-    };
+    const newOrder = mapNewOrder(email, req.body);
 
     await orderModel.create(newOrder).then(async (addedOrder) => {
-      const newOrderUpdate = {
-        orderId: addedOrder.id,
-        clientEmail: addedOrder.clientEmail,
-        currentLocation: addedOrder.currentLocation,
-        currentStatus: addedOrder.currentStatus,
-        updatedBy: addedOrder.clientEmail,
-        additionalInfo: "Order has been created by the client!",
-      };
+      const newOrderUpdate = mapNewOrderUpdate(addedOrder);
 
       await ordersHistoryModel.create(newOrderUpdate).then(() => {
         res.status(200).json({
