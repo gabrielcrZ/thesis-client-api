@@ -4,14 +4,14 @@ import {
   ordersHistoryModel,
 } from "../models/Models.js";
 import { decodeAuthorizationToken } from "../middlewares/Auth.js";
-import { mapNewOrder, mapNewOrderUpdate } from "../helpers/PayloadMapper.js";
+import { mapNewOrder, mapNewOrderUpdate, mapOrdersToClientOrders } from "../helpers/PayloadMapper.js";
 import bcrypt from "bcrypt";
 
 export const addClient = async (req, res) => {
   try {
-    await clientModel.create({ ...req.body }).then(() => {
+    await clientModel.create({ ...req.body }).then((newClient) => {
       res.status(200).json({
-        msg: "User created!",
+        msg: `User ${newClient.id} created!`,
       });
     });
   } catch (error) {
@@ -46,7 +46,7 @@ export const addOrder = async (req, res) => {
       await ordersHistoryModel.create(newOrderUpdate).then(() => {
         res.status(200).json({
           msg: "Order was added successfully!",
-          order: addedOrder,
+          orderNr: addedOrder.id,
         });
       });
     });
@@ -68,7 +68,7 @@ export const getOrders = async (req, res) => {
       .sort("createdAt")
       .then((clientOrders) => {
         res.status(200).json({
-          orders: clientOrders || [],
+          orders: mapOrdersToClientOrders(clientOrders) || [],
           count: clientOrders.length,
         });
       });
@@ -92,7 +92,7 @@ export const getOrder = async (req, res) => {
       })
       .then((foundOrder) => {
         res.status(200).json({
-          order: foundOrder || "",
+          order: mapOrdersToClientOrders(foundOrder) || "",
         });
       });
   } catch (error) {
