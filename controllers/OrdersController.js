@@ -1,4 +1,5 @@
 import {
+  clientModel,
   orderModel,
   ordersHistoryModel,
 } from "../models/Models.js";
@@ -9,8 +10,10 @@ export const addOrder = async (req, res) => {
   try {
     let authFromHeaders = req.headers.authorization;
     const token = authFromHeaders.split(" ")[1];
-    const email = decodeAuthorizationToken(token).email;
-    const newOrder = mapNewOrder(email, req.body);
+    const decodedEmail = decodeAuthorizationToken(token).email;
+
+    var client = await clientModel.findOne({email : decodedEmail})
+    const newOrder = mapNewOrder(decodedEmail, client.clientName, client.clientPhone, req.body);
 
     await orderModel.create(newOrder).then(async (addedOrder) => {
       const newOrderUpdate = mapNewOrderUpdate(addedOrder);
