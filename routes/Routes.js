@@ -5,6 +5,7 @@ import {
   addOrder,
   getOrders,
   getOrder,
+  updateClient,
 } from "../controllers/OrdersController.js";
 import { cancelOrder } from "../async/CancelOrderAsync.js";
 import {
@@ -16,6 +17,8 @@ import {
 const router = Router();
 router.route("/add-client").post(newClientHandler, addClient);
 router.route("/get-token").post(tokenRequestHandler, getToken);
+router.route("/update-client").patch(authorizationHandler, updateClient);
+
 router.route("/add-order").post(authorizationHandler, addOrder);
 router.route("/cancel-order").post(authorizationHandler, cancelOrder);
 router.route("/get-orders").get(authorizationHandler, getOrders);
