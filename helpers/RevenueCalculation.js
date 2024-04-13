@@ -6,7 +6,6 @@ export const calculateOrderRevenue = (
   const revenuePerKg = calculateRevenue(departureRegion, arrivalRegion);
   let revenue = 0;
   products.forEach((el) => {
-    console.log(el.productWeight);
     revenue += parseInt(el.productWeight) * revenuePerKg;
   });
 
