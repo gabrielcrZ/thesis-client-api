@@ -18,8 +18,8 @@ const clientModel = mongoose.model(
       required: [true, "No client name provided!"],
     },
     clientAddress: {
-      type: String,
-      required: [true, "No client address provided!"],
+      type: Object,
+      required: [true, "No client address information provided!"],
     },
     clientPhone: {
       type: String,
@@ -41,31 +41,27 @@ const orderModel = mongoose.model(
         ],
       },
       products: {
-        type: [String],
+        type: [Object],
         required: [true, "A list of products is required!"],
       },
-      departFrom: {
-        type: String,
-        required: [true, "No departure location provided!"],
+      pickupDetails: {
+        type: Object,
+        required: [true, "Pickup details were not provided!"],
       },
-      shipTo: {
-        type: String,
-        required: [true, "No delivery location provided!"],
-      },
-      shipmentWeight: {
-        type: String,
-        match: [
-          /\d+\.{0,1}\d{1,3}kg$/gm,
-          "Provided weight format is not valid (only kg's)!",
-        ],
-      },
-      currentLocation: {
-        type: String,
-        required: [true, "No current location provided for the shipment!"],
+      shippingDetails: {
+        type: Object,
+        required: [true, "No shipping details were provided!"],
       },
       currentStatus: {
         type: String,
         required: [true, "No status provided for the shipment!"],
+      },
+      estimatedRevenue: {
+        type: String,
+        required: [
+          true,
+          "Estimated revenue could not be calculated for this order!",
+        ],
       },
       lastUpdatedBy: {
         type: String,
@@ -84,7 +80,7 @@ const ordersHistoryModel = mongoose.model(
     {
       operationType: {
         type: String,
-        required: [true, "No operation type provided for the update"]
+        required: [true, "No operation type provided for the update"],
       },
       orderId: {
         type: String,
