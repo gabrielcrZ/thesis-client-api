@@ -32,13 +32,9 @@ const orderModel = mongoose.model(
   "Order",
   new mongoose.Schema(
     {
-      clientEmail: {
-        type: String,
-        required: [true, "No email provided!"],
-        match: [
-          /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g,
-          "Email address is not valid!",
-        ],
+      contactDetails: {
+        type: [Object],
+        required: [true, "No contact details provided!"],
       },
       products: {
         type: [Object],
