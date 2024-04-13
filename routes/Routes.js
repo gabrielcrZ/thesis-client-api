@@ -1,12 +1,14 @@
 import { Router } from "express";
 import {
-  addClient,
-  getToken,
   addOrder,
   getOrders,
   getOrder,
-  updateClient,
 } from "../controllers/OrdersController.js";
+import {
+  addClient,
+  getToken,
+  updateClient,
+} from "../controllers/ClientController.js";
 import { cancelOrder } from "../async/CancelOrderAsync.js";
 import {
   tokenRequestHandler,
