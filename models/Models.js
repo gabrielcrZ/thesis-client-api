@@ -33,7 +33,7 @@ const orderModel = mongoose.model(
   new mongoose.Schema(
     {
       contactDetails: {
-        type: [Object],
+        type: Object,
         required: [true, "No contact details provided!"],
       },
       products: {

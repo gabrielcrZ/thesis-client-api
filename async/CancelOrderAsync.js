@@ -1,4 +1,4 @@
-import { Send } from "./AsyncSend";
+import { Send } from "./AsyncSend.js";
 
 export const cancelOrder = (req, res) => {
   const rabbit = new Send().execute(req.body);

@@ -1,32 +1,28 @@
-import { calculateOrderRevenue } from "./RevenueCalculation";
+import { calculateOrderRevenue } from "./RevenueCalculation.js";
 
 export const mapNewOrder = (clientEmail, orderRequest) => {
   const orderRevenue = calculateOrderRevenue(
     orderRequest.products,
-    orderRequest.pickupDetails.region,
-    orderRequest.shippingDetails.region
+    orderRequest.pickupDetails.pickupRegion,
+    orderRequest.shippingDetails.shippingRegion
   );
-  return {
-    contactDetails: {
-      email: clientEmail,
-      name: orderRequest.contactDetails.clientName,
-      phone: orderRequest.contactDetails.phoneNr,
-    },
-    currentStatus: "Registered by client",
-    lastUpdatedBy: clientEmail,
-    estimatedRevenue: orderRevenue,
-    ...orderRequest,
-  };
+
+  orderRequest.contactDetails.contactEmail = clientEmail;
+  orderRequest.currentStatus = "Registered by client";
+  orderRequest.lastUpdatedBy = clientEmail;
+  orderRequest.estimatedRevenue = orderRevenue;
+
+  return orderRequest;
 };
 
 export const mapNewOrderUpdate = (newOrder) => {
   return {
     operationType: "Update",
     orderId: newOrder.id,
-    clientEmail: newOrder.contactDetails.email,
-    currentLocation: newOrder.pickupDetails.address,
+    clientEmail: newOrder.contactDetails.contactEmail,
+    currentLocation: `${newOrder.pickupDetails.pickupCity}, ${newOrder.pickupDetails.pickupCountry}`,
     currentStatus: newOrder.currentStatus,
-    updatedBy: newOrder.contactDetails.clientEmail,
+    updatedBy: newOrder.contactDetails.contactEmail,
     additionalInfo: "Order has been created by the client!",
   };
 };

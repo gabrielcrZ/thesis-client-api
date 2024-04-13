@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { clientModel } from "../models/Models";
+import { clientModel } from "../models/Models.js";
 import { decodeAuthorizationToken } from "../middlewares/Auth.js";
 
 
