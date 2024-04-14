@@ -12,6 +12,7 @@ export const mapNewOrder = (
     orderRequest.shippingDetails.shippingRegion
   );
   orderRequest.currentStatus = "Registered by client";
+  orderRequest.currentLocation = "At pickup client address";
   orderRequest.lastUpdatedBy = clientEmail;
   orderRequest.estimatedRevenue = orderRevenue;
   orderRequest.pickupDetails.pickupId = null;
@@ -29,13 +30,6 @@ export const mapNewOrderUpdate = (newOrder) => {
   return {
     operationType: "Update",
     orderId: newOrder.id,
-    clientEmail: newOrder.pickupDetails.pickupClient.clientEmail,
-    currentLocation: `${newOrder.pickupDetails.pickupCity}, ${newOrder.pickupDetails.pickupCountry}`,
-    currentStatus: newOrder.currentStatus,
-    pickupId: null,
-    pickupStatus: "Not assigned",
-    shippingId: null,
-    shippingStatus: "Not assigned",
     updatedBy: newOrder.pickupDetails.pickupClient.clientEmail,
     additionalInfo: "Order has been created by the client!",
   };
@@ -43,11 +37,11 @@ export const mapNewOrderUpdate = (newOrder) => {
 
 export const mapOrdersToClientOrders = (orders) => {
   const mappedOrders = orders.map((order) => {
-    order.contactDetails,
-      order.products,
+    order.products,
       order.pickupDetails,
       order.shippingDetails,
-      order.currentStatus;
+      order.currentStatus,
+      order.currentLocation;
   });
 
   return mappedOrders;
