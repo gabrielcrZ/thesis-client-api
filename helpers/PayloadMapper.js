@@ -28,7 +28,7 @@ export const mapNewOrder = (
 
 export const mapNewOrderUpdate = (newOrder) => {
   return {
-    operationType: "Update",
+    operationType: "Create order",
     orderId: newOrder.id,
     updatedBy: newOrder.pickupDetails.pickupClient.clientEmail,
     additionalInfo: "Order has been created by the client!",
