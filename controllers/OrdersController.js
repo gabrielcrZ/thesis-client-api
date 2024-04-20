@@ -4,26 +4,55 @@ import {
   ordersHistoryModel,
 } from "../models/Models.js";
 import { decodeAuthorizationToken } from "../middlewares/Auth.js";
-import { mapNewOrder, mapNewOrderUpdate, mapOrdersToClientOrders } from "../helpers/PayloadMapper.js";
+import {
+  mapNewOrder,
+  mapNewOrderUpdate,
+  mapOrdersToClientOrders,
+} from "../helpers/PayloadMapper.js";
 
 export const addOrder = async (req, res) => {
   try {
     let authFromHeaders = req.headers.authorization;
     const token = authFromHeaders.split(" ")[1];
-    const decodedEmail = decodeAuthorizationToken(token).email;
+    const decodedToken = decodeAuthorizationToken(token);
+    const decodedEmail = decodedToken.email;
+    const decodedClientId = decodedToken.clientId;
 
-    var client = await clientModel.findOne({email : decodedEmail})
-    const newOrder = mapNewOrder(decodedEmail, client.clientName, client.clientPhone, req.body);
+    var client = await clientModel.findOne({
+      email: decodedEmail,
+      _id: decodedClientId,
+    });
+    const newOrder = mapNewOrder(
+      decodedEmail,
+      client._id,
+      client.clientName,
+      client.clientPhone,
+      req.body
+    );
 
     await orderModel.create(newOrder).then(async (addedOrder) => {
-      const newOrderUpdate = mapNewOrderUpdate(addedOrder);
-
-      await ordersHistoryModel.create(newOrderUpdate).then(() => {
-        res.status(200).json({
-          msg: "Order was added successfully!",
-          orderNr: addedOrder.id,
+      if (!addedOrder) {
+        res.status(400).json({
+          msg: `Order could not be added`,
         });
-      });
+      } else {
+        const newOrderUpdate = mapNewOrderUpdate(addedOrder);
+
+        await ordersHistoryModel
+          .create(newOrderUpdate)
+          .then((newOrderUpdate) => {
+            if (!newOrderUpdate) {
+              res.status(400).json({
+                msg: `Order ${addedOrder._id} was added but the initial order updated failed`,
+              });
+            } else {
+              res.status(200).json({
+                msg: "Order was added successfully!",
+                orderId: addedOrder.id,
+              });
+            }
+          });
+      }
     });
   } catch (error) {
     res.status(500).json({
@@ -36,7 +65,7 @@ export const getOrders = async (req, res) => {
   try {
     let authFromHeaders = req.headers.authorization;
     const token = authFromHeaders.split(" ")[1];
-    const decodedEmail = decodeAuthorizationToken(token).email;
+    const decodedClient = decodeAuthorizationToken(token).email;
 
     await orderModel
       .find({ clientEmail: decodedEmail })
@@ -76,5 +105,3 @@ export const getOrder = async (req, res) => {
     });
   }
 };
-
-

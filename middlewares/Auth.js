@@ -10,11 +10,29 @@ const tokenRequestHandler = async (req, res, next) => {
     });
   }
 
-  const token = jwt.sign({ email, clientCode }, process.env.JWT_SECRET, {
-    expiresIn: "1d",
+  await clientModel.findOne({ email: email }).then(async (foundClient) => {
+    if (!foundClient) {
+      res.status(400).json({
+        msg: `No client found with email: ${email}`,
+      });
+    } else {
+      const isMatchingClientCode = await bcrypt.compare(
+        clientCode,
+        foundClient.clientCode
+      );
+      if (!isMatchingClientCode) {
+        res.status(400).json({
+          msg: `Provided client code is invalid for email: ${email}`
+        })
+      } else {
+        const clientId = foundClient._id;
+        const token = jwt.sign({ email, clientCode, clientId}, process.env.JWT_SECRET, {
+          expiresIn: "1d",
+        });
+        res.token = token;
+      }
+    }
   });
-  res.token = token;
-
   next();
 };
 

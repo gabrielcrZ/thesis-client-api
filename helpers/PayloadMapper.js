@@ -2,6 +2,7 @@ import { calculateOrderRevenue } from "./RevenueCalculation.js";
 
 export const mapNewOrder = (
   clientEmail,
+  clientId,
   clientName,
   clientPhone,
   orderRequest
@@ -11,19 +12,24 @@ export const mapNewOrder = (
     orderRequest.pickupDetails.pickupRegion,
     orderRequest.shippingDetails.shippingRegion
   );
-  orderRequest.currentStatus = "Registered by client";
-  orderRequest.currentLocation = "At pickup client address";
-  orderRequest.lastUpdatedBy = clientEmail;
-  orderRequest.estimatedRevenue = orderRevenue;
-  orderRequest.pickupDetails.pickupId = null;
-  orderRequest.pickupDetails.pickupStatus = "Not assigned";
-  orderRequest.pickupDetails.pickupClient.clientEmail = clientEmail;
-  orderRequest.pickupDetails.pickupClient.clientName = clientName;
-  orderRequest.pickupDetails.pickupClient.clientPhone = clientPhone;
-  orderRequest.shippingDetails.shippingId = null;
-  orderRequest.shippingDetails.shippingStatus = "Not assigned";
 
-  return orderRequest;
+  return {
+    clientId: clientId,
+    products: orderRequest.products,
+    pickupDetails: {
+      ...orderRequest.pickupDetails,
+      pickupClient: {
+        clientEmail: clientEmail,
+        clientName: clientName,
+        clientPhone: clientPhone,
+      },
+    },
+    shippingDetails: orderRequest.shippingDetails,
+    currentStatus: "Registered by client",
+    currentLocation: "At pickup client address",
+    estimatedRevenue: orderRevenue,
+    lastUpdatedBy: clientEmail,
+  };
 };
 
 export const mapNewOrderUpdate = (newOrder) => {
@@ -45,4 +51,13 @@ export const mapOrdersToClientOrders = (orders) => {
   });
 
   return mappedOrders;
+};
+
+export const mapClientInformation = (clientModel) => {
+  return {
+    email: clientModel.email,
+    clientName: clientModel.clientName,
+    clientAddress: clientModel.clientAddress,
+    clientPhone: clientModel.clientPhone,
+  };
 };
