@@ -11,6 +11,11 @@ export const cancelOrder = async (req, res) => {
     await orderModel
       .findOne({ _id: req.params.id, clientId: decodedClientId })
       .then((foundOrder) => {
+        if (!foundOrder) {
+          res.status(400).json({
+            msg: `No order with id ${req.params.id} was found`,
+          });
+        }
         if (!foundOrder.currentStatus === "Registered by client") {
           res.status(400).json({
             msg: `Order ${req.params.id} can't be cancelled because it was already processed or is invalid`,

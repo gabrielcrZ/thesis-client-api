@@ -40,10 +40,12 @@ export const addOrder = async (req, res) => {
 
         await ordersHistoryModel
           .create(newOrderUpdate)
-          .then((newOrderUpdate) => {
+          .then(async (newOrderUpdate) => {
             if (!newOrderUpdate) {
-              res.status(400).json({
-                msg: `Order ${addedOrder._id} was added but the initial order updated failed`,
+              await orderModel.deleteOne(addedOrder).then(() => {
+                res.status(400).json({
+                  msg: `Order ${addedOrder._id} was not added because the initial update failed`,
+                });
               });
             } else {
               res.status(200).json({
@@ -65,10 +67,9 @@ export const getOrders = async (req, res) => {
   try {
     let authFromHeaders = req.headers.authorization;
     const token = authFromHeaders.split(" ")[1];
-    const decodedClient = decodeAuthorizationToken(token).email;
-
+    const decodedClientId = decodeAuthorizationToken(token).clientId;
     await orderModel
-      .find({ clientEmail: decodedEmail })
+      .find({ clientId: decodedClientId })
       .sort("createdAt")
       .then((clientOrders) => {
         res.status(200).json({
@@ -87,16 +88,21 @@ export const getOrder = async (req, res) => {
   try {
     let authFromHeaders = req.headers.authorization;
     const token = authFromHeaders.split(" ")[1];
-    const decodedEmail = decodeAuthorizationToken(token).email;
+    const decodedClientId = decodeAuthorizationToken(token).clientId;
 
     await orderModel
       .findOne({
         _id: req.params.id,
-        clientEmail: decodedEmail,
+        clientId: decodedClientId,
       })
       .then((foundOrder) => {
+        if (!foundOrder) {
+          res.status(400).json({
+            msg: `No order with id ${req.params.id} was found`,
+          });
+        }
         res.status(200).json({
-          order: mapOrdersToClientOrders(foundOrder) || "",
+          order: mapOrdersToClientOrders([foundOrder]) || "",
         });
       });
   } catch (error) {

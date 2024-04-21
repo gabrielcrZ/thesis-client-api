@@ -43,11 +43,13 @@ export const mapNewOrderUpdate = (newOrder) => {
 
 export const mapOrdersToClientOrders = (orders) => {
   const mappedOrders = orders.map((order) => {
-    order.products,
-      order.pickupDetails,
-      order.shippingDetails,
-      order.currentStatus,
-      order.currentLocation;
+    return {
+      products: order.products,
+      pickupDetails: order.pickupDetails,
+      shippingDetails: order.shippingDetails,
+      currentStatus: order.currentStatus,
+      currentLocation: order.currentLocation,
+    };
   });
 
   return mappedOrders;

@@ -41,7 +41,7 @@ const authorizationHandler = async (req, res, next) => {
 
   if (!authFromHeaders || !authFromHeaders.startsWith("Bearer")) {
     res.status(401).json({
-      msg: "Authorization token was not provided!",
+      msg: "Authorization token was not provided or is invalid!",
     });
   }
 
@@ -76,10 +76,10 @@ const authorizationHandler = async (req, res, next) => {
 };
 
 const newClientHandler = async (req, res, next) => {
-  const clientCode = req.body.clientCode;
-  if (!clientCode) {
+  const {email, clientCode} = req.body;
+  if (!email || !clientCode) {
     return res.status(400).json({
-      msg: "Client code was not provided!",
+      msg: "Email or client code was not provided for the registration",
     });
   }
   const salt = await bcrypt.genSalt(10);
