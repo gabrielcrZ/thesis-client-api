@@ -28,6 +28,7 @@ export const mapNewOrder = (
     currentStatus: "Registered by client",
     currentLocation: "At pickup client address",
     estimatedRevenue: orderRevenue,
+    assignedTransport: "Not assigned",
     lastUpdatedBy: clientEmail,
   };
 };
