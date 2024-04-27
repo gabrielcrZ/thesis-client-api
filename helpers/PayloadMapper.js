@@ -18,17 +18,22 @@ export const mapNewOrder = (
     products: orderRequest.products,
     pickupDetails: {
       ...orderRequest.pickupDetails,
+      pickupId: null,
+      pickupStatus: "Not assigned",
       pickupClient: {
         clientEmail: clientEmail,
         clientName: clientName,
         clientPhone: clientPhone,
       },
     },
-    shippingDetails: orderRequest.shippingDetails,
+    shippingDetails: {
+      ...orderRequest.shippingDetails,
+      shippingId: null,
+      shippingStatus: "Not assigned",
+    },
     currentStatus: "Registered by client",
     currentLocation: "At pickup client address",
     estimatedRevenue: orderRevenue,
-    assignedTransport: "Not assigned",
     lastUpdatedBy: clientEmail,
   };
 };

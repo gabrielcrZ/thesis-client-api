@@ -95,10 +95,6 @@ const orderModel = mongoose.model(
           "Estimated revenue could not be calculated for this order!",
         ],
       },
-      assignedTransport: {
-        type: String,
-        required: [true, "Transport has not been provided for this order!"],
-      },
       lastUpdatedBy: {
         type: String,
         required: [true, "No last updater provided for the shipment!"],
