@@ -1,6 +1,7 @@
 import { Send } from "./AsyncSend.js";
-import { clientModel, orderModel } from "../models/Models.js";
+import { clientModel, orderModel, messagesModel } from "../models/Models.js";
 import { decodeAuthorizationToken } from "../middlewares/Auth.js";
+import { mapCancelOrderMessage } from "../helpers/PayloadMapper.js";
 
 export const cancelOrder = async (req, res) => {
   try {
@@ -10,7 +11,7 @@ export const cancelOrder = async (req, res) => {
 
     await orderModel
       .findOne({ _id: req.params.id, clientId: decodedClientId })
-      .then((foundOrder) => {
+      .then(async (foundOrder) => {
         if (!foundOrder) {
           res.status(400).json({
             msg: `No order with id ${req.params.id} was found`,
@@ -28,6 +29,13 @@ export const cancelOrder = async (req, res) => {
           };
           new Send().execute(message);
 
+          const messageBody = mapCancelOrderMessage(
+            foundOrder.pickupDetails.pickupClient.clientEmail,
+            req.params.id,
+            req.body.cancelReason
+          );
+
+          await messagesModel.create({ messageBody });
           res.status(200).json({
             message: "Order cancel request successfully sent!",
           });
@@ -56,17 +64,16 @@ export const deleteClient = async (req, res) => {
           res.status(400).json({
             msg: `No client with id: ${req.params.id} was found`,
           });
-        } else {
-          const message = {
-            clientId: req.params.id,
-            ...req.body,
-          };
-
-          new Send().execute(message);
-          res.status(200).json({
-            msg: `Delete request for client ${req.params.id} has been sent`,
-          });
         }
+        const message = {
+          clientId: req.params.id,
+          ...req.body,
+        };
+
+        new Send().execute(message);
+        res.status(200).json({
+          msg: `Delete request for client ${req.params.id} has been sent`,
+        });
       });
   } catch (error) {
     res.status(500).json({

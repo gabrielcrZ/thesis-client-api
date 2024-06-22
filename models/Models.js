@@ -132,4 +132,33 @@ const ordersHistoryModel = mongoose.model(
   )
 );
 
-export { clientModel, orderModel, ordersHistoryModel };
+const messagesModel = mongoose.model(
+  "Message",
+  new mongoose.Schema(
+    {
+      from: {
+        type: String,
+        required: [true, "No email provided!"],
+        match: [
+          /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g,
+          "Email address is invalid!",
+        ],
+      },
+      shortMessage: {
+        type: String,
+        required: [true, "No short message was provided!"],
+      },
+      longMessage: {
+        type: String,
+        required: [true, "No long message was provided!"],
+      },
+      referenceId: {
+        type: String,
+        required: [true, "No reference was provided!"],
+      },
+    },
+    { timestamps: true }
+  )
+);
+
+export { clientModel, orderModel, ordersHistoryModel, messagesModel };

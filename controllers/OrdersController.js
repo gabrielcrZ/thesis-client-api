@@ -1,11 +1,13 @@
 import {
   clientModel,
+  messagesModel,
   orderModel,
   ordersHistoryModel,
 } from "../models/Models.js";
 import { decodeAuthorizationToken } from "../middlewares/Auth.js";
 import {
   mapNewOrder,
+  mapNewOrderMessage,
   mapNewOrderUpdate,
   mapOrdersToClientOrders,
 } from "../helpers/PayloadMapper.js";
@@ -35,26 +37,28 @@ export const addOrder = async (req, res) => {
         res.status(400).json({
           msg: `Order could not be added`,
         });
-      } else {
-        const newOrderUpdate = mapNewOrderUpdate(addedOrder);
-
-        await ordersHistoryModel
-          .create(newOrderUpdate)
-          .then(async (newOrderUpdate) => {
-            if (!newOrderUpdate) {
-              await orderModel.deleteOne(addedOrder).then(() => {
-                res.status(400).json({
-                  msg: `Order ${addedOrder._id} was not added because the initial update failed`,
-                });
-              });
-            } else {
-              res.status(200).json({
-                msg: "Order was added successfully!",
-                orderId: addedOrder.id,
-              });
-            }
-          });
       }
+      const newOrderUpdate = mapNewOrderUpdate(addedOrder);
+
+      await ordersHistoryModel
+        .create(newOrderUpdate)
+        .then(async (newOrderUpdate) => {
+          if (!newOrderUpdate) {
+            await orderModel.deleteOne(addedOrder).then(() => {
+              res.status(400).json({
+                msg: `Order ${addedOrder._id} was not added because the initial update failed`,
+              });
+            });
+          }
+
+          const messageBody = mapNewOrderMessage(addedOrder);
+          await messagesModel.create(messageBody);
+
+          res.status(200).json({
+            msg: "Order was added successfully!",
+            orderId: addedOrder.id,
+          });
+        });
     });
   } catch (error) {
     res.status(500).json({

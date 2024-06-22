@@ -1,20 +1,26 @@
 import bcrypt from "bcrypt";
-import { clientModel } from "../models/Models.js";
+import { clientModel, messagesModel } from "../models/Models.js";
 import { decodeAuthorizationToken } from "../middlewares/Auth.js";
-import { mapClientInformation } from "../helpers/PayloadMapper.js";
+import {
+  mapClientInformation,
+  mapNewClientMessage,
+  mapUpdateClientMessage,
+} from "../helpers/PayloadMapper.js";
 
 export const addClient = async (req, res) => {
   try {
-    await clientModel.create({ ...req.body }).then((newClient) => {
+    await clientModel.create({ ...req.body }).then(async (newClient) => {
       if (!newClient) {
         res.status(400).json({
           msg: `Create new client operation failed`,
         });
-      } else {
-        res.status(200).json({
-          msg: `Client ${newClient.id} created successfully!`,
-        });
       }
+      const messageBody = mapNewClientMessage(newClient);
+      await messagesModel.create(messageBody);
+
+      res.status(200).json({
+        msg: `Client ${newClient.id} created successfully!`,
+      });
     });
   } catch (error) {
     res.status(500).json({
@@ -28,11 +34,10 @@ export const getToken = async (req, res) => {
     res.status(400).json({
       body: req.body,
     });
-  } else {
-    res.status(200).json({
-      token: res.token,
-    });
   }
+  res.status(200).json({
+    token: res.token,
+  });
 };
 
 export const updateClient = async (req, res) => {
@@ -53,12 +58,16 @@ export const updateClient = async (req, res) => {
     const filters = { _id: req.params.id, email: decodedEmail };
     await clientModel
       .findOneAndUpdate(filters, updateRequest)
-      .then((foundClient) => {
+      .then(async (foundClient) => {
         if (!foundClient) {
           res.status(400).json({
             msg: `Client ${req.params.id} can't be updated or is invalid`,
           });
         }
+
+        const messageBody = mapUpdateClientMessage(foundClient);
+        await messagesModel.create(messageBody);
+
         res.status(200).json({
           msg: `Client ${req.params.id} has been updated successfully`,
           updates: updateRequest,
