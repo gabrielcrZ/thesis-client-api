@@ -76,6 +76,7 @@ export const mapCancelOrderMessage = (clientEmail, orderId, cancelReason) => {
     shortMessage: "Order cancellation has been requested by client",
     longMessage: `Order has been marked for cancellation for the following reason: ${cancelReason}.`,
     referenceId: orderId,
+    messageStatus: "Unseen",
   };
 };
 
@@ -85,6 +86,7 @@ export const mapNewClientMessage = (client) => {
     shortMessage: "A newly client has been created",
     longMessage: `A client has been created. Client: ${client.clientName}, Address: ${client.clientAddress}, Phone: ${client.clientPhone}.`,
     referenceId: client._id,
+    messageStatus: "Unseen",
   };
 };
 
@@ -94,6 +96,7 @@ export const mapUpdateClientMessage = (client) => {
     shortMessage: "A client's information has been updated.",
     longMessage: `Client: ${client.clientName} has updated his information.`,
     referenceId: client._id,
+    messageStatus: "Unseen",
   };
 };
 
@@ -103,5 +106,6 @@ export const mapNewOrderMessage = (order) => {
     shortMessage: "A order has been added by a client.",
     longMessage: `Order: ${order._id} has been created by client: ${order.clientId}. Pickup city: ${order.pickupDetails.pickupCity} and delivery city: ${order.shippingDetails.shippingCity}.`,
     referenceId: order._id,
+    messageStatus: "Unseen",
   };
 };

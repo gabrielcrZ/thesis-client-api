@@ -156,6 +156,10 @@ const messagesModel = mongoose.model(
         type: String,
         required: [true, "No reference was provided!"],
       },
+      messageStatus: {
+        type: String,
+        required: [true, "Status for this messages has not been set!"],
+      },
     },
     { timestamps: true }
   )
