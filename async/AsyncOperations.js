@@ -22,24 +22,24 @@ export const cancelOrder = async (req, res) => {
             msg: `Order ${req.params.id} can't be cancelled because it was already processed or is invalid`,
             currentStatus: foundOrder.currentStatus,
           });
-        } else {
-          const message = {
-            orderId: req.params.id,
-            ...req.body,
-          };
-          new Send().execute(message);
-
-          const messageBody = mapCancelOrderMessage(
-            foundOrder.pickupDetails.pickupClient.clientEmail,
-            req.params.id,
-            req.body.cancelReason
-          );
-
-          await messagesModel.create({ messageBody });
-          res.status(200).json({
-            message: "Order cancel request successfully sent!",
-          });
         }
+
+        const message = {
+          orderId: req.params.id,
+          ...req.body,
+        };
+        new Send().execute(message);
+
+        const messageBody = mapCancelOrderMessage(
+          foundOrder.pickupDetails.pickupClient.clientEmail,
+          req.params.id,
+          req.body.cancelReason
+        );
+
+        await messagesModel.create({ messageBody });
+        res.status(200).json({
+          message: "Order cancel request successfully sent!",
+        });
       });
   } catch (error) {
     res.status(500).json({

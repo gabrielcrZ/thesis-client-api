@@ -93,11 +93,10 @@ export const getClient = async (req, res) => {
           res.status(400).json({
             msg: `Client ${req.params.id} could not be found`,
           });
-        } else {
-          res.status(200).json({
-            client: mapClientInformation(foundClient),
-          });
         }
+        res.status(200).json({
+          client: mapClientInformation(foundClient),
+        });
       });
   } catch (error) {
     res.status(500).json({

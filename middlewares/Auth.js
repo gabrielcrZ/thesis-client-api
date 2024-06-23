@@ -15,23 +15,25 @@ const tokenRequestHandler = async (req, res, next) => {
       res.status(400).json({
         msg: `No client found with email: ${email}`,
       });
-    } else {
-      const isMatchingClientCode = await bcrypt.compare(
-        clientCode,
-        foundClient.clientCode
-      );
-      if (!isMatchingClientCode) {
-        res.status(400).json({
-          msg: `Provided client code is invalid for email: ${email}`
-        })
-      } else {
-        const clientId = foundClient._id;
-        const token = jwt.sign({ email, clientCode, clientId}, process.env.JWT_SECRET, {
-          expiresIn: "1d",
-        });
-        res.token = token;
-      }
     }
+    const isMatchingClientCode = await bcrypt.compare(
+      clientCode,
+      foundClient.clientCode
+    );
+    if (!isMatchingClientCode) {
+      res.status(400).json({
+        msg: `Provided client code is invalid for email: ${email}`,
+      });
+    }
+    const clientId = foundClient._id;
+    const token = jwt.sign(
+      { email, clientCode, clientId },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1d",
+      }
+    );
+    res.token = token;
   });
   next();
 };
@@ -76,7 +78,7 @@ const authorizationHandler = async (req, res, next) => {
 };
 
 const newClientHandler = async (req, res, next) => {
-  const {email, clientCode} = req.body;
+  const { email, clientCode } = req.body;
   if (!email || !clientCode) {
     return res.status(400).json({
       msg: "Email or client code was not provided for the registration",
