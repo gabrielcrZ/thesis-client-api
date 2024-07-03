@@ -9,7 +9,8 @@ import {
 
 export const addClient = async (req, res) => {
   try {
-    await clientModel.create({ ...req.body }).then(async (newClient) => {
+    const clientDetails = {...req.body, lastUpdatedBy: req.body.email}
+    await clientModel.create(clientDetails).then(async (newClient) => {
       if (!newClient) {
         res.status(400).json({
           msg: `Create new client operation failed`,
