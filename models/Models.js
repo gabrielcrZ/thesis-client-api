@@ -54,6 +54,7 @@ const orderModel = mongoose.model(
             productDescription: String,
             productCategory: String,
             productWeight: String,
+            productRevenue: String,
             _id: false,
           },
         ],

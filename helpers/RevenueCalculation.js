@@ -9,7 +9,10 @@ export const calculateOrderRevenue = (
     revenue += parseInt(el.productWeight) * revenuePerKg;
   });
 
-  return revenue.toString();
+  return {
+    revenuePerKg: revenuePerKg,
+    revenue: revenue,
+  };
 };
 
 const calculateRevenue = (departureRegion, arrivalRegion) => {

@@ -13,9 +13,18 @@ export const mapNewOrder = (
     orderRequest.shippingDetails.shippingRegion
   );
 
+  const calculatedProducts = orderRequest.products.map((el) => {
+    return {
+      productDescription: el.productDescription,
+      productCategory: el.productCategory,
+      productWeight: el.productWeight,
+      productRevenue: parseInt(el.productWeight) * orderRevenue.revenuePerKg,
+    };
+  });
+
   return {
     clientId: clientId,
-    products: orderRequest.products,
+    products: calculatedProducts,
     pickupDetails: {
       ...orderRequest.pickupDetails,
       pickupId: null,
@@ -33,7 +42,7 @@ export const mapNewOrder = (
     },
     currentStatus: "Registered by client",
     currentLocation: "At pickup client address",
-    estimatedRevenue: orderRevenue,
+    estimatedRevenue: orderRevenue.revenue,
     lastUpdatedBy: clientEmail,
   };
 };
